@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const ejs = require("ejs");
-const Photo = require("./models/Photo")
+const Photo = require("./models/Photo");
 
 const app = express();
 
@@ -12,20 +12,28 @@ mongoose.connect("mongodb://localhost/pcat-test-db", {
   useUnifiedTopology: true,
 });
 
-
 //TEMPLATE ENGINE olarak ejs kullanacağız
 app.set("view engine", "ejs");
 
 //middlewares
 app.use(express.static("public"));
-app.use(express.urlencoded({extended:true}))
-app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.get("/", async (req, res) => {
-  const photos = await Photo.find({})
+  const photos = await Photo.find({});
   res.render("index", {
-    photos
+    photos,
   });
+});
+
+//photo detay sayfası
+app.get("/photos/:id", async (req, res) => {
+  //res.render("about");
+  const photo = await Photo.findById(req.params.id)
+  res.render('photo', {
+    photo
+  })
 });
 
 app.get("/about", (req, res) => {
@@ -37,10 +45,9 @@ app.get("/add", (req, res) => {
 });
 
 app.post("/photos", async (req, res) => {
-  await Photo.create(req.body)
-  res.redirect('/')
+  await Photo.create(req.body);
+  res.redirect("/");
 });
-
 
 const port = 3000;
 app.listen(port, () => {
